@@ -24,9 +24,7 @@ module('Application | basics', function (hooks) {
   });
 
   test('clicking the backdrop does not close the modal if `clickOutsideDeactivates` is `false`', async function (assert) {
-    this.owner.lookup('service:modals').focusTrapOptions = {
-      clickOutsideDeactivates: false,
-    };
+    this.owner.lookup('service:modals').clickOutsideDeactivates = false;
 
     await visit('/');
 

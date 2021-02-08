@@ -1,43 +1,44 @@
-ember-promise-modals
-==============================================================================
+<p align="center"><img src=".github/epm.svg" role="presentation" alt="" /></p>
 
-ember-promise-modals provides a way to render and handle modals in Ember.js apps.
+# ember-promise-modals
 
+The better way to handle modals in your Ember.js apps.
 
-Compatibility
-------------------------------------------------------------------------------
+## Compatibility
 
-* Ember.js v3.4 or above
-* Ember CLI v2.13 or above
-* ember-animated v0.8
-* Node.js v10, v12, v14 or above
+- Ember.js v3.4 or above
+- Ember CLI v2.13 or above
+- Node.js v10, v12, v14 or above
 
-Installation
-------------------------------------------------------------------------------
+## Installation
 
 ```
-ember install ember-animated
 ember install ember-promise-modals
 ```
 
-Usage
-------------------------------------------------------------------------------
+## Usage
 
-To use EPM in your project, you first need to inject the `modals` service:
+To use EPM in your project, add the target for the modals to your `application.hbs`:
+
+```hbs
+<EpmModalContainer />
+```
+
+Then you need to inject the `modals` service wherever you need to open a modal:
 
 ```javascript
 @service modals;
 ```
 
-Then, call the `open` method with a component name to render it as a modal:
+Now you can call the `open` method with a component name to render it as a modal:
 
 ```javascript
 this.modals.open('component-to-render');
 ```
 
-### Simple usage
+### Basic usage
 
-Here is a simple code example:
+Here is a basic code example:
 
 ```javascript
 import { inject as service } from '@ember/service';
@@ -63,9 +64,10 @@ Then in your template, you can:
 ### Attributes
 
 You can pass custom data into your rendered template like so:
+
 ```javascript
 this.modals.open('file-preview', {
-  fileUrl: this.fileUrl
+  fileUrl: this.fileUrl,
 });
 ```
 
@@ -91,110 +93,140 @@ order to trigger the "close modal" action. It can be called like so:
 
 <button {{on "click" @close}}>Close</button>
 ```
+
 ```javascript
 // app/components/file-preview.js
 
 this.close(); // or this.args.close() in Glimmer components
 ```
 
-Animation
-------------------------------------------------------------------------------
+## Animation
 
-### Custom animation
+This addon uses CSS animations. You can either replace the
+[styles of this addon](./addon/styles/ember-promise-modals.css) with your own
+or adjust the defaults using CSS custom properties in your `:root{}`
+declaration or in the CSS of any parent container of `<EpmModalContainer />`.
 
-EPM uses [ember-animated](https://github.com/ember-animation/ember-animated) to
-animate the modals.
+Available properties and their defaults can be found in the `:root {}` block inside the addons css.
 
-You can override the default easing function using libraries like [d3-ease](https://github.com/d3/d3-ease).
-To do so, you must override the [`modalsTransition` method from the `modals` service](https://github.com/simplabs/ember-promise-modals/blob/master/addon/services/modals.js#L19)
-in your own app.
+By default, the animations are dropped when `prefers-reduced-motion` is
+detected.
 
-Create a new `modals` service like:
+### Custom animations
+
+To override the animation for a specific modal, an `options` object containing
+a custom `className` can be handed to the `.open()` method.
 
 ```javascript
-// app/services/modals.js
+this.modals.open(
+  'file-preview',
+  {
+    fileUrl: this.fileUrl,
+  },
+  {
+    // custom class, see below for example
+    className: 'custom-modal',
+    // optional: name the animation triggered by the custom css class
+    //           animations ending in "-out" are detected by default!
+    animation: 'custom-animation-name-out',
+    // optional: adjust the timeout for the out animation
+    timeout: 300,
+  },
+);
+```
 
-import { easeSinInOut, easeCubicOut } from 'd3-ease';
-import move from 'ember-animated/motions/move';
-import ModalServices from 'ember-promise-modals/services/modals';
+```css
+.custom-modal {
+  animation: custom-animation-in 0.5s;
+  opacity: 1;
+  transform: translate(0, 0);
+}
 
-export default ModalServices.extend({
-  *modalsTransition({ insertedSprites, keptSprites, removedSprites }) {
-    insertedSprites.forEach(sprite => {
-      sprite.startAtPixel({ y: -window.innerHeight });
-      move(sprite, { easing: easeCubicOut });
-    });
+/* 
+  The `.epm-out` class is added to the parent of the modal when the modal 
+  should be closed, which triggers the animation
+*/
+.custom-modal.epm-out {
+  animation: custom-animation-name-out 0.2s; /* default out animation is 2s */
+  opacity: 0;
+  transform: translate(0, 100%);
+}
 
-    keptSprites.forEach(sprite => {
-      move(sprite);
-    });
+/* 
+  animation name has to end in "-out" to be detected by the custom animationend 
+  event handler 
+*/
+@keyframes custom-animation-name-out {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 100%);
+  }
+}
+```
 
-    removedSprites.forEach(sprite => {
-      sprite.endAtPixel({ y: -window.innerHeight });
-      move(sprite, { easing: easeSinInOut });
-    });
+The CSS animations which are applied by the custom CSS class _must_ end in
+`-out` to make the animations trigger the modal removal. To ensure proper
+behavior, a `timeout` option is avaialble as well which will remove the modal
+directly. The default timeout can be adjusted on the `modals` service using the
+`outAnimationTimeout` property. The timeout will be set to `0` in tests.
+
+### CSS Variables
+
+The addons CSS is run through PostCSS by default, which will create static
+fallbacks for all custom properties using their defaults.
+
+If your application uses PostCSS by itself, you can set `excludeCSS` to `true`
+inside your `ember-cli-build.js`:
+
+```js
+let app = new EmberAddon(defaults, {
+  // Add options here
+  'ember-promise-modals': {
+    excludeCSS: true,
   },
 });
 ```
 
-### Transition direction
+Done that, you can use [postcss-import](https://github.com/postcss/postcss-import)
+to import the uncompiled addon styles in your projects `app/styles/app.css`:
 
-By default, the EPM modal appears from top-to-bottom. You can change that to
-bottom-to-up for example, by passing a custom value on EPM invocation:
-
-```javascript
-this.modals.open('file-preview', {
-  reverseAnimation: true
-});
+```css
+@import 'ember-promise-modals';
 ```
 
-And update your service:
+## Accessibility
 
-```javascript
-insertedSprites.forEach(sprite => {
-  if (sprite.owner.value._data.reverseAnimation) {
-    sprite.startAtPixel({ y: window.innerHeight });
-  } else {
-    sprite.startAtPixel({ y: -window.innerHeight });
-  }
-  move(sprite, { easing: easeCubicOut });
-});
-
-// ...
-
-removedSprites.forEach(sprite => {
-  if (sprite.owner.value._data.reverseAnimation) {
-    sprite.endAtPixel({ y: window.innerHeight });
-  } else {
-    sprite.endAtPixel({ y: -window.innerHeight });
-  }
-  move(sprite, { easing: easeSinInOut });
-});
-```
-
-You can find other ways to create custom animations in the [ember-animated documentation](https://ember-animation.github.io/ember-animated/docs/transitions#custom)
-
-
-Accessibility
-------------------------------------------------------------------------------
-
-User can press the `ESC` key to close the modal.
+User can press the <kbd>Esc</kbd> key to close the modal.
 
 EPM uses [focus-trap](https://github.com/davidtheclark/focus-trap) internally
 in order to handle user focus.
 
 EPM will ensure to [focus the first "tabbable element" by default](https://www.w3.org/TR/wai-aria-practices-1.1/#dialog_modal).
 If no focusable element is present, focus will be applied on the currently
-visible modal amber-auto-generated container.
+visible auto-generated container for the current modal.
 
+## Testing
 
-Contributing
-------------------------------------------------------------------------------
+This addon provides a test helper function that reduces the timing for the CSS transitions to near zero to speed up your tests.
+
+```js
+import { setupPromiseModals } from 'ember-promise-modals/test-support';
+
+module('Application | ...', function (hooks) {
+  // ...
+  setupPromiseModals(hooks);
+  // ...
+});
+```
+
+## Contributing
 
 See the [Contributing](CONTRIBUTING.md) guide for details.
 
-
-License
-------------------------------------------------------------------------------
+## License
 
 This project is licensed under the [MIT License](LICENSE.md).
