@@ -1,19 +1,113 @@
+:root {
+  --epm-animation-in-duration: 0.3s;
+  --epm-animation-out-duration: 0.18s;
+  --epm-animation-in-name: epm-backdrop-in;
+  --epm-animation-out-name: epm-backdrop-out;
+  --epm-animation-backdrop-in: var(--epm-animation-in-name) var(--epm-animation-in-duration);
+  --epm-animation-backdrop-out: var(--epm-animation-out-name) var(--epm-animation-out-duration);
+  --epm-animation-modal-in: epm-modal-in var(--epm-animation-in-duration) ease-out;
+  --epm-animation-modal-out: epm-modal-out var(--epm-animation-out-duration) ease-out;
+  --epm-backdrop-background: #2d3748;
+  --epm-backdrop-opacity: 0.8;
+  --epm-container-padding: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --epm-animation-in-duration: 0;
+    --epm-animation-out-duration: 0;
+  }
+}
+
 .epm-scrolling-disabled {
   overflow: hidden;
 }
 
-.epm-backdrop {
+.epm-backdrop,
+.epm-modal-container {
   position: fixed;
-  left: 0;
   top: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(61, 65, 77, 0.8);
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.epm-backdrop {
+  background-color: var(--epm-backdrop-background);
+  opacity: var(--epm-backdrop-opacity);
+  animation: var(--epm-animation-backdrop-in);
+}
+
+.epm-modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--epm-container-padding);
+  overflow: auto;
+}
+
+.epm-animating .epm-modal-container {
+  overflow: hidden;
 }
 
 .epm-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: auto;
+  animation: var(--epm-animation-modal-in);
+  -webkit-overflow-scrolling: touch; /* momentum-based scrolling for Safari on iOS */
+}
+
+.epm-backdrop.epm-out {
+  opacity: 0;
+  animation: var(--epm-animation-backdrop-out);
+  pointer-events: none;
+}
+
+.epm-modal.epm-out {
+  transform: translate(0, -10vh) scale(0.8);
+  opacity: 0;
+  animation: var(--epm-animation-modal-out);
+  pointer-events: none;
+}
+
+@keyframes epm-backdrop-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: var(--epm-backdrop-opacity);
+  }
+}
+
+@keyframes epm-backdrop-out {
+  0% {
+    opacity: var(--epm-backdrop-opacity);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes epm-modal-in {
+  0% {
+    transform: translate(0, -30vh) scale(1.1);
+    opacity: 0;
+  }
+  72% {
+    transform: translate(0, 0) scale(0.99);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes epm-modal-out {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  95% {
+    transform: translate(0, -10vh) scale(0.8);
+    opacity: 0;
+  }
 }

@@ -4,9 +4,12 @@ import { inject as service } from '@ember/service';
 export default Controller.extend({
   modals: service(),
 
+  flip: false,
+
   actions: {
-    showModal() {
-      this.modals.open('modal1');
+    showModal(options) {
+      this.modals.open('modal1', undefined, options);
+      this.toggleProperty('flip');
     },
   },
 });

@@ -1,1 +1,3 @@
-{{component @modal._name data=@modal._data close=(action "close")}}
+<div id={{this.modalElementId}} class="epm-modal {{this.optionsClassName}} {{this.animatingOutClass}}">
+  {{component @modal._name data=@modal._data close=(action "close")}}
+</div>

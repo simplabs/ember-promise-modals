@@ -12,7 +12,11 @@
   Laoreet tincidunt blandit tempor viverra dui volutpat natoque, ut vestibulum mauris posuere arcu ante sociosqu nostra, habitant dapibus torquent litora id porttitor. Nec faucibus rhoncus vestibulum ultricies augue imperdiet, accumsan sem penatibus parturient curabitur, hendrerit hac auctor eros natoque. Lacinia placerat eu suscipit curae cubilia potenti sociosqu, iaculis quis per augue vulputate risus sed, nunc netus habitasse vel mollis mauris.
 </p>
 
-<button type="button" data-test-show-modal {{action "showModal"}}>Show Modal</button>
+<button type="button" data-test-show-modal {{action "showModal"}}>Show Modal default</button>
+
+<button type="button" data-test-show-modal {{action "showModal" (hash className="from-bottom")}}>Show Modal from bottom</button>
+
+<button type="button" data-test-show-modal {{action "showModal" (hash className="from-top")}}>Show Modal from top</button>
 
 <p>
   Aenean nostra egestas in eu nunc consequat praesent scelerisque vivamus, mattis curabitur luctus pharetra curae vestibulum phasellus class, natoque dis proin aptent blandit condimentum mi vel. Sapien non integer nulla quam mauris turpis nisl erat, himenaeos inceptos cum aliquam congue consequat donec malesuada, orci a viverra montes cursus posuere nisi, penatibus suscipit magna potenti nostra semper scelerisque. Eu sodales magna accumsan ante lobortis mauris, sollicitudin luctus class aliquam facilisi vulputate, fusce phasellus cubilia porttitor mus.
@@ -54,4 +58,4 @@
   Laoreet tincidunt blandit tempor viverra dui volutpat natoque, ut vestibulum mauris posuere arcu ante sociosqu nostra, habitant dapibus torquent litora id porttitor. Nec faucibus rhoncus vestibulum ultricies augue imperdiet, accumsan sem penatibus parturient curabitur, hendrerit hac auctor eros natoque. Lacinia placerat eu suscipit curae cubilia potenti sociosqu, iaculis quis per augue vulputate risus sed, nunc netus habitasse vel mollis mauris.
 </p>
 
-<EpmModalContainer/>
+<EpmModalContainer />

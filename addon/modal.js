@@ -1,10 +1,11 @@
 import { defer } from 'rsvp';
 
 export default class Modal {
-  constructor(service, name, data) {
+  constructor(service, name, data, options = {}) {
     this._service = service;
     this._name = name;
     this._data = data;
+    this._options = options;
     this._result = undefined;
     this._deferred = defer();
   }

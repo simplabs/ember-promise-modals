@@ -1,9 +1,76 @@
 .modal1 {
   width: 600px;
   max-width: 100%;
-  max-height: 100%;
   border-radius: 6px;
   background-color: white;
-  box-shadow: 0 4px 28px 0 rgba(200, 200, 200, 0.36);
+  box-shadow: 0 4px 28px 0 rgba(0, 0, 0, 0.36);
   padding: 16px 32px;
+}
+
+.from-bottom {
+  animation: from-bottom-in 0.5s;
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.from-top {
+  animation: from-top-in 0.5s;
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.from-top.epm-out {
+  animation: from-top-out 0.5s;
+  opacity: 0;
+  transform: translate(0, 100vh);
+}
+
+.from-bottom.epm-out {
+  animation: from-bottom-out 0.5s;
+  opacity: 0;
+  transform: translate(0, 100vh);
+}
+
+@keyframes from-bottom-in {
+  0% {
+    opacity: 0;
+    transform: translate(0, 100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes from-bottom-out {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 100%);
+  }
+}
+
+@keyframes from-top-in {
+  0% {
+    opacity: 0;
+    transform: translate(0, -100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes from-top-out {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -100%);
+  }
 }

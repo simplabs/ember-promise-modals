@@ -1,10 +1,7 @@
 import { A } from '@ember/array';
+import { set } from '@ember/object';
 import { alias } from '@ember/object/computed';
 import Service from '@ember/service';
-
-import { easeOut, easeIn } from 'ember-animated/easings/cosine';
-import move from 'ember-animated/motions/move';
-import fade from 'ember-animated/transitions/fade';
 
 import Modal from '../modal';
 
@@ -13,38 +10,28 @@ export default Service.extend({
   top: alias('_stack.lastObject'),
 
   clickOutsideDeactivates: true,
-
-  backdropDuration: 600,
-  backdropTransition: fade,
-
-  modalsDuration: 250,
-  *modalsTransition({ insertedSprites, keptSprites, removedSprites }) {
-    insertedSprites.forEach(sprite => {
-      sprite.startAtPixel({ y: -window.innerHeight });
-      move(sprite, { easing: easeOut });
-    });
-
-    keptSprites.forEach(sprite => {
-      move(sprite);
-    });
-
-    removedSprites.forEach(sprite => {
-      sprite.endAtPixel({ y: -window.innerHeight });
-      move(sprite, { easing: easeIn });
-    });
-  },
+  outAnimationTimeout: 200,
 
   init() {
     this._super(...arguments);
     this._stack = A([]);
+
+    let mediaQueryList = matchMedia('(prefers-reduced-motion: reduce)');
+    let mediaQueryCallback = () => {
+      set(this, 'outAnimationTimeout', mediaQueryList.matches ? 0 : this.outAnimationTimeout);
+    };
+
+    mediaQueryList.addEventListener('change', mediaQueryCallback);
+    mediaQueryCallback();
   },
 
   willDestroy() {
     this._onLastModalRemoved();
   },
 
-  open(name, data) {
-    let modal = new Modal(this, name, data);
+  open(name, data, options) {
+    let modal = new Modal(this, name, data, options);
+
     this._stack.pushObject(modal);
 
     if (this._stack.length === 1) {
@@ -60,5 +47,13 @@ export default Service.extend({
 
   _onLastModalRemoved() {
     document.body.classList.remove('epm-scrolling-disabled');
+  },
+
+  _onModalAnimationStart() {
+    document.body.classList.add('epm-animating');
+  },
+
+  _onModalAnimationEnd() {
+    document.body.classList.remove('epm-animating');
   },
 });
